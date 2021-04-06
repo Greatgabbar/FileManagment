@@ -11,7 +11,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import axios from '../util/axios'
 import {useState} from 'react';
-import {useHistory,useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +42,7 @@ const Control=()=>{
           }
         }).then(res=> {
           console.log(res);
+          window.location.reload();
         }).catch(err=>console.log(err));
       }else{
         const str= location.pathname.split('/');

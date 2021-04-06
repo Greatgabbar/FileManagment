@@ -25,25 +25,19 @@ const App= () => {
             File Managment
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
           <Router>
           <Switch>
             <Route path="/">
+        <Grid item xs={12} sm={6}>
               <View />
-            </Route>
-          </Switch>
-          </Router>
         </Grid>
         <Grid item xs={12} sm={6}>
-        <Router>
-          <Switch>
-            <Route path="/">
               <Control />
               <Move/>
+        </Grid>
             </Route>
           </Switch>
           </Router>
-        </Grid>
       </Grid>
     </div>
   );

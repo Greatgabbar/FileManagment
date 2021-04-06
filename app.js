@@ -27,5 +27,21 @@ app.get('/',(req,res)=>{
     res.send('GG Well pLay Boys');
 })
 
-
-app.listen(5000);
+const port=process.env.PORT || 5000
+app.listen(port);
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.resolve(__dirname, "client", "build")));
+    app.get("/*", function (req, res) {
+      // this -->
+      res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+    });
+  }
+  
+  // Handle unhandled promise rejections
+  process.on("unhandledRejection", (err, promise) => {
+    console.log(`Error: ${err.message}`);
+  });
+  
+  process.on("uncaughtException", (err, promise) => {
+    console.log(`Error: ${err.message}`);
+  });

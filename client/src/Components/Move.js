@@ -6,12 +6,9 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
 import axios from '../util/axios'
 import {useState} from 'react';
-import {useHistory,useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,18 +32,19 @@ const Move=()=>{
       if(location.pathname==="/"){
         axios({
           method:'POST',
-          url:`/folder/new`,
+          url:`/folder/move`,
           data:{
               name : name,
               to : 'root'
           }
         }).then(res=> {
           console.log(res);
+          window.location.reload();
         }).catch(err=>console.log(err));
       }else{
         axios({
           method:'POST',
-          url:`/folder/new`,
+          url:`/folder/move`,
           data:{
               name : name,
               to : to

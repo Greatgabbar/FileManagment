@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: theme.spacing(4, 0, 2),
+    textAlign:'center'
   },
 }));
 
@@ -92,7 +93,7 @@ const clickHandle=(id,cat)=>{
                   </ListItemSecondaryAction>
                 </ListItem>
         )
-    }) : null;
+    }) : <Typography style={{textAlign:'center'}} variant="body1" >Use add Button to add Folder</Typography>;
 
 
   return (
