@@ -3,6 +3,7 @@ const app= express();
 const bodyParser=require('body-parser');
 const mongoose= require('mongoose');
 require('dotenv').config();
+const path = require("path");
 const cors= require('cors');
 app.use(cors({ origin: `${process.env.CLIENT_URL}`, credentials: true }));
 
