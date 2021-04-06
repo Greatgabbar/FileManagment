@@ -40,7 +40,7 @@ router.get('/folder/all',async (req,res)=>{
             console.log(lol);
         })
         console.log(arr);
-        return res.send(200).status('all folder');
+        return res.send(arr);
     // Folder.findOne({_id : "606bfe900283814320f77a76"}).populate('content').then(data=>{
     //     console.log(data);
     // })
@@ -48,20 +48,19 @@ router.get('/folder/all',async (req,res)=>{
 
 // ------- moving folder api--------------
 router.post('/folder/move',(req,res)=>{
-    const {from,to} = req.body;
-    Folder.findOne({name : from}).then(data=>{
+    const {name,to} = req.body;
+    Folder.findOne({name : name}).then(async data=>{
         if(!data) return res.send(404).status("No Source file Found");
-        if(to==null){
+        if(to==='root'){
             data.parent=null;
-            data.save().then(gg=>{
-                return res.send(200).status("Moved Successfully !!");
-            })
+            const gg=await data.save();
+                return res.status(200).send({msg:"Moved Successfully !!"});
         }
         Folder.findOne({name : to}).then(gg=>{
             if(!gg) return res.send(404).status("No destination file Found");
             data.parent=gg._id;
             data.save().then(ff=>{
-                res.send(200).status("Moved Successfully !!");
+                return res.send("Moved Successfully !!");
             })
         })
     })
@@ -69,20 +68,19 @@ router.post('/folder/move',(req,res)=>{
 
 // ------------ moving file api ---------------
 router.post('/file/move',(req,res)=>{
-    const {from,to} = req.body;
-    Folder.findOne({name : from}).then(data=>{
-        if(!data) return res.send(404).status("No Source file Found");
-        if(to==null){
+    const {name,to} = req.body;
+    Folder.findOne({name : name}).then(async data=>{
+        if(!data) return res.status(400).send("No Source file Found");
+        if(to==='root'){
             data.parent=null;
-            data.save().then(gg=>{
-                return res.send(200).status("Moved Successfully !!");
-            })
+            const gg=await data.save();
+                return res.status(200).send({msg:"Moved Successfully !!"});
         }
         Folder.findOne({name : to}).then(gg=>{
-            if(!gg) return res.send(404).status("No destination file Found");
+            if(!gg) return res.status(400).send("No destination file Found");
             data.parent=gg._id;
             data.save().then(ff=>{
-                res.send(200).status("Moved Successfully !!");
+                return res.status(200).send("Moved Successfully !!");
             })
         })
     })
@@ -90,23 +88,25 @@ router.post('/file/move',(req,res)=>{
 
 //------get data for specific folder API --------------
 
-router.post('/folder/info',(req,res)=>{
-    const {name} = req.body;
+router.get('/folder/info/:name',(req,res)=>{
+    const {name} = req.params;
     const arr=[];
     Folder.findOne({name : name}).populate('content').then(data=>{
+        if(!data) return res.send('No Folder found with this name');
         if(!data.content.length) return res.send(200).status('No files in this folder');
         data.content.forEach(gg=>{
             arr.push(gg.name);
         })
-        return res.send(200).status(arr);
+        return res.send(arr);
     })
 })
 
 // --------del folder -----api
 
-router.post('/folder/del/:id',(req,res)=>{
-    const {id}=req.params;
-    Folder.findById(id).then(data=>{
+router.post('/folder/del',(req,res)=>{
+    const {name}=req.body;
+    Folder.findOne({name : name}).then(data=>{
+        if(!data) return res.send('No Folder found with this name');
         Folder.find({parent : data._id}).then(dd=>{
             dd.forEach(gg=>{
                 gg.remove();
@@ -118,9 +118,10 @@ router.post('/folder/del/:id',(req,res)=>{
     })
 })
 //  ---------del-file api----------
-router.post('/file/del/:id',(req,res)=>{
-    const {id}=req.params;
-    Folder.findById(id).then(data=>{
+router.post('/file/del',(req,res)=>{
+    const {name}=req.body;
+    Folder.findOne({name : name}).then(data=>{
+        if(!data) return res.send('No file found with this name');
             data.remove().then(gg=>{
                 res.send('deleted successfully');
             })
@@ -147,23 +148,25 @@ router.post('/folder/new',async (req,res)=>{
         name :name,
         parent : parent 
     })
-    folder.save().then(data=>{
-        console.log(data);
-        Folder.findOne({_id : parent}).then(async (lol)=>{
-            if(lol.cat==='file') return res.send(400).status('U cant insert file in file');
-            console.log(lol);
-            lol.content.push(data._id);
-            await lol.save();
-            return res.send("data added !!");
+   
+    Folder.findOne({_id : parent}).then(data=>{
+        if(data.cat==='file') {
+            console.log(1);
+            return res.send('U cant insert file in file');
+         }
+         folder.save().then(lol=>{
+             data.content.push(lol._id);
+             data.save().then(ff=>{
+                return res.send("data added !!");
+             })
+         })
         })
-    })
 })
 
 // ----------------------------adding new file api-------------------
 
 router.post('/file/new',async (req,res)=>{
     const {name , parent }=req.body;
-    console.log(req.body,parent);
     if(parent===undefined){
         console.log(1)
         const folder=new Folder({
@@ -175,21 +178,23 @@ router.post('/file/new',async (req,res)=>{
         })
         return res.send(200).status('Data Added');
     }
-    console.log(2)
     const folder=new Folder({
         name :name,
         parent : parent ,
         cat : 'file'
     })
-    folder.save().then(data=>{
-        console.log(data);
-        Folder.findOne({_id : parent}).then(async (lol)=>{
-            if(lol.cat==='file') return res.send(400).status('U cant insert file in file');
-            console.log(lol);
-            lol.content.push(data._id);
-            await lol.save();
+    
+    Folder.findOne({_id : parent}).then(data=>{
+    if(data.cat==='file') {
+        console.log(1);
+        return res.send('U cant insert file in file');
+     }
+     folder.save().then(lol=>{
+         data.content.push(lol._id);
+         data.save().then(ff=>{
             return res.send("data added !!");
-        })
+         })
+     })
     })
 })
 
