@@ -95,6 +95,10 @@ router.post('/folder/info',(req,res)=>{
     const arr=[];
     Folder.findOne({name : name}).populate('content').then(data=>{
         if(!data.content.length) return res.send(200).status('No files in this folder');
+        data.content.forEach(gg=>{
+            arr.push(gg.name);
+        })
+        return res.send(200).status(arr);
     })
 })
 
@@ -146,6 +150,7 @@ router.post('/folder/new',async (req,res)=>{
     folder.save().then(data=>{
         console.log(data);
         Folder.findOne({_id : parent}).then(async (lol)=>{
+            if(lol.cat==='file') return res.send(400).status('U cant insert file in file');
             console.log(lol);
             lol.content.push(data._id);
             await lol.save();
@@ -179,6 +184,7 @@ router.post('/file/new',async (req,res)=>{
     folder.save().then(data=>{
         console.log(data);
         Folder.findOne({_id : parent}).then(async (lol)=>{
+            if(lol.cat==='file') return res.send(400).status('U cant insert file in file');
             console.log(lol);
             lol.content.push(data._id);
             await lol.save();
