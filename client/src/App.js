@@ -1,6 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles';
 import {Paper , Grid , Typography} from '@material-ui/core';
 import View from './Components/View';
+import {Route ,BrowserRouter as Router, Switch} from 'react-router-dom'
+import Control from './Components/Control'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -24,10 +26,16 @@ const App= () => {
           </Typography>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <View />
+          <Router>
+          <Switch>
+            <Route path="/">
+              <View />
+            </Route>
+          </Switch>
+          </Router>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Paper className={classes.paper}>xs=12 sm=6</Paper>
+          <Control/>
         </Grid>
       </Grid>
     </div>

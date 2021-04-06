@@ -13,7 +13,7 @@ import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import axios from '../util/axios';
-
+import {useHistory,useLocation,useParams} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,10 +29,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function InteractiveList() {
+const View = (props) => {
     const classes = useStyles();
       const [foldata,setFoldata]= useState([]);
-
+    const history = useHistory();
+    const params=useParams();
+    const location = useLocation();
 const deleteHandle = (name)=>{
     axios({
         method:'POST',
@@ -46,15 +48,35 @@ const deleteHandle = (name)=>{
     }).catch(err=>console.log(err));
 }
 
+const clickHandle=(name,cat)=>{
+  if(cat==='file')
+    return;
+    let loc;
+    if(location.pathname==="/"){
+      loc=`/${name}`;
+    }else{
+      loc=location.pathname+ `/${name}`;
+    }
+    history.push(`${loc}`);
+}
+
   useEffect(()=>{
+    if(location.pathname==='/'){
       axios.get('/folder/info/root').then(data=>{
           console.log(data);
           setFoldata(data.data);
       })
-  },[])
-  const list= foldata.length ? foldata.map(data=>{
+    }else{
+      const str= location.pathname.split('/');
+      axios.get(`/folder/info/${str[str.length-1]}`).then(data=>{
+        console.log(data);
+        setFoldata(data.data);
+    })
+    }
+  },[location.pathname])
+  const list= foldata ? foldata.map(data=>{
         return (
-            <ListItem button key={data._id}>
+            <ListItem button key={data._id} onClick={()=>{clickHandle(data.name,data.cat)}}>
                   <ListItemAvatar>
                     <Avatar>
                       {data.cat==="folder" ? <FolderIcon /> : <InsertDriveFileIcon/>}
@@ -78,7 +100,7 @@ const deleteHandle = (name)=>{
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <Typography variant="h6" className={classes.title}>
-            Avatar with text and icon
+            Folders
           </Typography>
           <div className={classes.demo}>
             <List>
@@ -90,3 +112,6 @@ const deleteHandle = (name)=>{
     </div>
   );
 }
+
+
+export default View;

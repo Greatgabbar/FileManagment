@@ -88,16 +88,31 @@ router.post('/file/move',(req,res)=>{
 
 //------get data for specific folder API --------------
 
-router.get('/folder/info/:name',(req,res)=>{
+router.get('/folder/info/:name',async (req,res)=>{
     const {name} = req.params;
     const arr=[];
+    if(name==='root'){
+        const data = await Folder.find({parent:null});
+            data.forEach(async ff=>{
+                await arr.push({
+                    _id : ff._id,
+                    name : ff.name,
+                    cat : ff.cat
+                })
+                return await res.status(200).send(arr);   
+        })
+    }
     Folder.findOne({name : name}).populate('content').then(data=>{
         if(!data) return res.send('No Folder found with this name');
         if(!data.content.length) return res.send(200).status('No files in this folder');
         data.content.forEach(gg=>{
-            arr.push(gg.name);
+            arr.push({
+                _id : gg._id,
+                name : gg.name,
+                cat: gg.cat
+            });
         })
-        return res.send(arr);
+        return res.status(200).send(arr);
     })
 })
 

@@ -24,4 +24,7 @@ $ cd FileManagment
 ```bash
 npm i
 node app.js
+cd client
+npm i
+npm run start
 ```
