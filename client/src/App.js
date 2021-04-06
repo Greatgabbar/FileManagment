@@ -1,9 +1,9 @@
 import { makeStyles } from '@material-ui/core/styles';
-import {Paper , Grid , Typography} from '@material-ui/core';
+import {Grid , Typography} from '@material-ui/core';
 import View from './Components/View';
 import {Route ,BrowserRouter as Router, Switch} from 'react-router-dom'
 import Control from './Components/Control'
-
+import Move from './Components/Move'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,7 +35,14 @@ const App= () => {
           </Router>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Control/>
+        <Router>
+          <Switch>
+            <Route path="/">
+              <Control />
+              <Move/>
+            </Route>
+          </Switch>
+          </Router>
         </Grid>
       </Grid>
     </div>

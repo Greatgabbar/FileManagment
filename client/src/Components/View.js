@@ -13,7 +13,7 @@ import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import axios from '../util/axios';
-import {useHistory,useLocation,useParams} from 'react-router-dom';
+import {useHistory,useLocation} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,29 +33,29 @@ const View = (props) => {
     const classes = useStyles();
       const [foldata,setFoldata]= useState([]);
     const history = useHistory();
-    const params=useParams();
     const location = useLocation();
-const deleteHandle = (name)=>{
+const deleteHandle = (id,cat)=>{
+    const url=cat==="file" ? '/file/del' : '/folder/del';
     axios({
         method:'POST',
-        url:'/file/del',
+        url:url,
         data:{
-            name : name
+            id : id
         }
     }).then(res=> {
-        const arr=foldata.filter(gg=>gg.name!==name);
+        const arr=foldata.filter(gg=>gg._id!==id);
         setFoldata(arr);
     }).catch(err=>console.log(err));
 }
 
-const clickHandle=(name,cat)=>{
+const clickHandle=(id,cat)=>{
   if(cat==='file')
     return;
     let loc;
     if(location.pathname==="/"){
-      loc=`/${name}`;
+      loc=`/${id}`;
     }else{
-      loc=location.pathname+ `/${name}`;
+      loc=location.pathname+ `/${id}`;
     }
     history.push(`${loc}`);
 }
@@ -76,7 +76,7 @@ const clickHandle=(name,cat)=>{
   },[location.pathname])
   const list= foldata ? foldata.map(data=>{
         return (
-            <ListItem button key={data._id} onClick={()=>{clickHandle(data.name,data.cat)}}>
+            <ListItem button key={data._id} onClick={()=>{clickHandle(data._id,data.cat)}}>
                   <ListItemAvatar>
                     <Avatar>
                       {data.cat==="folder" ? <FolderIcon /> : <InsertDriveFileIcon/>}
@@ -86,7 +86,7 @@ const clickHandle=(name,cat)=>{
                     primary={`${data.name}`}
                   />
                   <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="delete" onClick={()=>{deleteHandle(data.name)}}>
+                    <IconButton edge="end" aria-label="delete" onClick={()=>{deleteHandle(data._id)}}>
                       <DeleteIcon />
                     </IconButton>
                   </ListItemSecondaryAction>

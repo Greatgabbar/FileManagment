@@ -22,35 +22,34 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-const Control=()=>{
+const Move=()=>{
     const classes = useStyles();
     const [open, setOpen] = useState(false);
-    const [type, setType] = useState('');
-    const [text,setText] = useState('');
+    const [name, setName] = useState('');
+    const [to,setTo] = useState('');
     const location = useLocation();
     const handleClickOpen = () => {
       setOpen(true);
     };
     const addFile = ()=>{
-      const tt= type==="file" ? 'file' :'folder';
       if(location.pathname==="/"){
         axios({
           method:'POST',
-          url:`/${tt}/new`,
+          url:`/folder/new`,
           data:{
-              name : text
+              name : name,
+              to : 'root'
           }
         }).then(res=> {
           console.log(res);
         }).catch(err=>console.log(err));
       }else{
-        const str= location.pathname.split('/');
         axios({
           method:'POST',
-          url:`/${tt}/new`,
+          url:`/folder/new`,
           data:{
-              name : text,
-              parent: str[str.length-1]
+              name : name,
+              to : to
           }
         }).then(res=> {
           console.log(res);
@@ -59,10 +58,10 @@ const Control=()=>{
       }
     }
     const handleChange = (event) => {
-        setType(event.target.value);
+        setName(event.target.value);
     }
     const handleChanget = (event) => {
-      setText(event.target.value);
+      setTo(event.target.value);
     }
     const handleClose = () => {
       setOpen(false);
@@ -72,34 +71,32 @@ const Control=()=>{
       <div className={classes.root}>
 
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
-          Add
+          Move
         </Button>
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">Add Folder/File</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              
+              *For adding folder in root use root in Destination folder
             </DialogContentText>
             <TextField
               autoFocus
               margin="dense"
               id="name"
-              label="Name"
+              label="Folder Name"
+              type="text"
+              fullWidth
+              onChange={handleChange}
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Destination folder"
               type="text"
               fullWidth
               onChange={handleChanget}
             />
-          <InputLabel id="demo-simple-select-label">Type</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={type}
-          onChange={handleChange}
-          fullWidth
-        >
-          <MenuItem value="file">File</MenuItem>
-          <MenuItem value="folder">Folder</MenuItem>
-        </Select>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="primary">
@@ -113,4 +110,4 @@ const Control=()=>{
       </div>
     )
 }
-export default Control;
+export default Move;

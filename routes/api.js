@@ -88,10 +88,11 @@ router.post('/file/move',(req,res)=>{
 
 //------get data for specific folder API --------------
 
-router.get('/folder/info/:name',async (req,res)=>{
-    const {name} = req.params;
+router.get('/folder/info/:id',async (req,res)=>{
+    const {id} = req.params;
+    console.log(id);
     const arr=[];
-    if(name==='root'){
+    if(id==="root"){
         const data = await Folder.find({parent:null});
             data.forEach(async ff=>{
                 await arr.push({
@@ -102,7 +103,7 @@ router.get('/folder/info/:name',async (req,res)=>{
                 return await res.status(200).send(arr);   
         })
     }
-    Folder.findOne({name : name}).populate('content').then(data=>{
+    Folder.findOne({_id : id}).populate('content').then(data=>{
         if(!data) return res.send('No Folder found with this name');
         if(!data.content.length) return res.send(200).status('No files in this folder');
         data.content.forEach(gg=>{
@@ -119,8 +120,8 @@ router.get('/folder/info/:name',async (req,res)=>{
 // --------del folder -----api
 
 router.post('/folder/del',(req,res)=>{
-    const {name}=req.body;
-    Folder.findOne({name : name}).then(data=>{
+    const {id}=req.body;
+    Folder.findOne({_id : id}).then(data=>{
         if(!data) return res.send('No Folder found with this name');
         Folder.find({parent : data._id}).then(dd=>{
             dd.forEach(gg=>{
@@ -134,8 +135,8 @@ router.post('/folder/del',(req,res)=>{
 })
 //  ---------del-file api----------
 router.post('/file/del',(req,res)=>{
-    const {name}=req.body;
-    Folder.findOne({name : name}).then(data=>{
+    const {id}=req.body;
+    Folder.findOne({_id : id}).then(data=>{
         if(!data) return res.send('No file found with this name');
             data.remove().then(gg=>{
                 res.send('deleted successfully');
