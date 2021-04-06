@@ -24,10 +24,6 @@ app.use(bodyParser.json())
 
 app.use('/api',require('./routes/api'));
 
-app.get('/',(req,res)=>{
-    res.send('GG Well pLay Boys');
-})
-
 const port=process.env.PORT || 5000
 app.listen(port);
 if (process.env.NODE_ENV === "production") {
